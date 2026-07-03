@@ -2,7 +2,10 @@ import React from "react";
 import Button from "./Button"; // 지난 시간에 만든 버튼 재사용!
 import useCartStore from "../store/useCartStore";
 
-function ProductCard({ product }) {
+// 🚀 [핵심] 컴포넌트 전체를 React.memo( )로 쏙 감싸줍니다!
+const ProductCard = React.memo(({ product }) => {
+  // 컴포넌트가 다시 그려질 때만 콘솔창에 로그가 찍힙니다.
+  console.log(`📦 ${product.title} 카드가 새로 그려졌어요!`);
   const { addToCart } = useCartStore();
   const cardStyle = {
     border: "1px solid #ddd",
@@ -32,6 +35,6 @@ function ProductCard({ product }) {
       </Button>
     </div>
   );
-}
+});
 
 export default ProductCard;
