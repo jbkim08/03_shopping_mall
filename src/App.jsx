@@ -9,9 +9,13 @@ import Modal from "./components/Modal";
 function App() {
   const { cart } = useCartStore();
   const { isOpen, open, close } = useToggle(false);
-
+  // 총 상품 개수
+  const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   // 💰 총금액 계산하기 (배열의 합계 구하기)
-  const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   const gridStyle = {
     display: "grid",
