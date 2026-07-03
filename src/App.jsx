@@ -28,7 +28,7 @@ function App() {
     <div>
       <header>
         <h1 style={{ textAlign: "center" }}>🛒 미니 굿즈 쇼핑몰</h1>
-        <Button onClick={open}>장바구니 보기 ({cart.length})</Button>
+        <Button onClick={open}>장바구니 보기 ({totalCount})</Button>
       </header>
       <div>
         <div style={gridStyle}>
@@ -48,7 +48,7 @@ function App() {
           <ul>
             {cart.map((item) => (
               <li key={item.id}>
-                {item.name} - {item.price}원
+                {item.name} - {item.price}원 ({item.quantity}개)
               </li>
             ))}
           </ul>
