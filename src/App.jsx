@@ -1,46 +1,77 @@
 import React from "react";
-import MOCK_PRODUCTS from "./mockData";
+import { useQuery } from "@tanstack/react-query";
 import ProductCard from "./components/ProductCard";
 import useCartStore from "./store/useCartStore";
 import useToggle from "./hook/useToggle";
-import Button from "./components/Button";
 import Modal from "./components/Modal";
+import Button from "./components/Button";
 
 function App() {
   const { cart } = useCartStore();
-  console.log(cart);
   const { isOpen, open, close } = useToggle(false);
-  // 총 상품 개수
-  const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  // 💰 총금액 계산하기 (배열의 합계 구하기)
+
+  // 🚀 [핵심] 만능 배달원에게 서버 주소 주고 데이터 받아오기
+  const {
+    data: products,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: () =>
+      fetch("https://fakestoreapi.com/products?limit=6").then((res) =>
+        res.json(),
+      ),
+  });
+
+  // 👮 1단계에서 배운 경비원 패턴 (Early Return)
+  if (isLoading)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        ⏳ 상품을 가져오는 중입니다...
+      </div>
+    );
+  if (isError)
+    return (
+      <div style={{ textAlign: "center", padding: "50px", color: "red" }}>
+        ❌ 서버 연결에 실패했습니다.
+      </div>
+    );
+
+  // 💰 장바구니 금액 합산 (수량 반영)
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
 
-  const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)", // 3열 바둑판 배열
-    gap: "20px",
-    padding: "20px",
-  };
-
   return (
-    <div>
-      <header>
-        <h1 style={{ textAlign: "center" }}>🛒 미니 굿즈 쇼핑몰</h1>
-        <Button onClick={open}>장바구니 보기 ({totalCount})</Button>
+    <div style={{ padding: "20px" }}>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>🛒 미니 굿즈 쇼핑몰</h1>
+        <Button onClick={open}>장바구니 보기 ({cart.length})</Button>
       </header>
-      <div>
-        <div style={gridStyle}>
-          {/* 가짜 데이터 배열을 돌면서 상품 카드를 화면에 그립니다. */}
-          {MOCK_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+      {/* 바둑판 모양 상품 목록 화면 */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "20px",
+          marginTop: "20px",
+        }}
+      >
+        {/* 💡 가짜 데이터 대신 서버에서 받아온 products 배열을 돌립니다! */}
+        {products?.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
 
-      {/* 장바구니 모달 내용물 */}
+      {/* 장바구니 모달 창 */}
       <Modal isOpen={isOpen} onClose={close}>
         <h2>🧳 장바구니 목록</h2>
         {cart.length === 0 ? (
@@ -49,14 +80,13 @@ function App() {
           <ul>
             {cart.map((item) => (
               <li key={item.id}>
-                {item.name} - {item.price}원 ({item.quantity}개)
+                {item.title} - {item.price}달러 ({item.quantity}개)
               </li>
             ))}
           </ul>
         )}
         <hr />
-        <h3>합계: {totalPrice.toLocaleString()}원</h3>
-        <Button onClick={() => alert("주문 페이지로 이동!")}>주문하기</Button>
+        <h3>합계: {totalPrice.toLocaleString()}달러</h3>
       </Modal>
     </div>
   );
