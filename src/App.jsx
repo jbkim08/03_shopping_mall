@@ -8,6 +8,7 @@ import Modal from "./components/Modal";
 
 function App() {
   const { cart } = useCartStore();
+  console.log(cart);
   const { isOpen, open, close } = useToggle(false);
   // 총 상품 개수
   const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
