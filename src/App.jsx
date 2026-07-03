@@ -7,10 +7,9 @@ import Modal from "./components/Modal";
 import Button from "./components/Button";
 
 function App() {
-  const { cart } = useCartStore();
+  const cart = useCartStore((state) => state.cart);
   const { isOpen, open, close } = useToggle(false);
 
-  // 🚀 [핵심] 만능 배달원에게 서버 주소 주고 데이터 받아오기
   const {
     data: products,
     isLoading,
